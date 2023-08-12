@@ -1,14 +1,10 @@
-import Habit from './components/Habit'
-import WeekSlider, { getCurWeek } from './components/WeekSlider'
-import AtomicHabit from './components/AtomicHabit'
+import HabitsContainer from './components/HabitsContainer'
 
 export default function Home() {
-  
-  
+   
   return (
     <main className="">
-      { <WeekSlider/> }
-      { } 
+      {<HabitsContainer/>}
     </main>
   )
 }

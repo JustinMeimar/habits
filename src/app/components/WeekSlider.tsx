@@ -50,11 +50,15 @@ const getWeekRepr = (d: Date): string => {
     return `${getWeekOrdinal(weekOfMonth)} Week of ${month}, ${year}`;
 }
 
-const WeekSlider: React.FC = () => {
-    const [currentWeek, setCurrentWeek] = useState<WeekTy>(getCurWeek(new Date()));
+type WeekSliderProps = {
+    curWeek: WeekTy;
+    setCurWeek: React.Dispatch<React.SetStateAction<WeekTy>>;
+};
+
+const WeekSlider: React.FC<WeekSliderProps> = ({curWeek, setCurWeek}) => {
 
     const incrementWeek = () => {
-        setCurrentWeek(prevWeek => {
+        setCurWeek(prevWeek => {
             if (prevWeek.num >= 52) {
                 return {
                     num: 1,
@@ -73,7 +77,7 @@ const WeekSlider: React.FC = () => {
     }
 
     const decrementWeek = () => {
-        setCurrentWeek(prevWeek => {
+        setCurWeek(prevWeek => {
             if (prevWeek.num <= 1) {
                 return {
                     num: 52,
@@ -94,7 +98,7 @@ const WeekSlider: React.FC = () => {
     return (
         <div>
             <button onClick={decrementWeek} >Previous</button>
-            <span>{currentWeek.repr}</span>
+            <span>{curWeek.repr}</span>
             <button onClick={incrementWeek} >Next</button>
         </div>
     );
