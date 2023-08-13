@@ -5,11 +5,17 @@ import WeekSlider, { WeekTy, getCurWeek } from './WeekSlider';
 import HabitRow from './HabitRow';
 import HabitModal from './HabitModal';
 
-
 export enum HabitType {
     Boolean = "boolean",
     Qualitative = "qualitative",
     Quantiative = "quantiative"
+}
+
+export type HabitDescExt = {
+    id: number, 
+    name: string, 
+    type: HabitType, 
+    data: any 
 }
 
 export type HabitDesc = {
@@ -19,8 +25,7 @@ export type HabitDesc = {
 }
 
 const HabitsContainer: React.FC = () => {    
-    
-    
+     
     const [curWeek, setCurWeek] = useState<WeekTy>(getCurWeek(new Date())); 
     const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
     const [newHabitName, setNewHabitName] = useState<string>("");

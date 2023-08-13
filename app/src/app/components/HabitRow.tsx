@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import HabitAtom from "./HabitAtom";
 import { HabitDesc } from "./HabitsContainer";
 
@@ -7,10 +7,10 @@ type HabitRowProps = {
 };
 
 const HabitRow: React.FC<HabitRowProps> = ({ habit }) => {
-    const numDailyHabits: number = 7;
     
+    const numDailyHabits: number = 7;    
     const [habitsChecked, setHabitsChecked] = useState(Array(numDailyHabits).fill(false));
- 
+
     const getWeekCount = (): number => {
         return habitsChecked.filter(checked => checked).length;
     };
@@ -24,7 +24,6 @@ const HabitRow: React.FC<HabitRowProps> = ({ habit }) => {
         });
     }
 
-    console.log(habitsChecked);
     return (
         <div>
             <div style={{ display: 'flex', border: '1px solid black' }}>
