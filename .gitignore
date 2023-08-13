@@ -2,7 +2,7 @@
 /flask/*.pyc
 /flask/__pycache__/
 /flask/.env
-/flask/venv/
-/flask/.venv/
+/flask/env/
+/flask/.env/
 /app/.next/
 /app/node_modules/
