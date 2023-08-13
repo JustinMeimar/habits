@@ -1,36 +1,31 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 # from auth import *
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="../app/b")
 # app.config['SECRET_KEY'] = 'your_secret_key'
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # Using SQLite for simplicity
 
 # db.init_app(app)
 # login_manager.init_app(app)
 
-@app.route('/get-habits')
+@app.route('/get-habits', methods=['GET'])
 def get_habits():
-    """
-    query parameters:
-    habit_id: the habit_id from the DB we want to retrieve the data fro
-    week_no: the week_no to retreive for  
-    year: the year to retrieve for 
-    """
     habit_id = request.args.get('habit_id', None)
-    week_no = request.args.get('week_no', None)
-    year = request.args.get('year', None)
+    date = request.args.get('date', None)
+    
+    if habit_id is None or date is None:
+        return jsonify(error="Missing parameters"), 400
+    
+    return jsonify(date=date, habit_id=habit_id)
 
-    assert habit_id is not None and year is not None
-
-    if week_no == None:
-        week_no = 1
-
-    return f"{week_no}, {habit_id}, {year}"
+from flask import send_from_directory
 
 @app.route("/")
 def index():
+    return send_from_directory(app.static_folder, "index.html")
     return "Hello, flask"
+
 # from flask import Flask, render_template, redirect, url_for, flash
 # from flask_login import current_user, login_user, logout_user, login_required
 
