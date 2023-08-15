@@ -42,15 +42,13 @@ def install_routes(app: Flask):
     def update_habits():
         pass
  
-    @app_bp.route('/get-habits', methods=['GET'])
-    def get_habits():
-        habit_id = request.args.get('habit_id', None)
-        if habit_id == None:
-            habits = db.session.query(Habit)
-             
-        else: 
-            habit = db.session.query(Habit).filter_by(id=habit_id).first() 
-            return f"{str(habit.habit_title)}"
+    @app_bp.route('/get-habits/<int:user_id>', methods=['GET'])
+    def get_habits(user_id):
+        user = User.query.get(user_id)
+        if user:
+            return jsonify(habits=[habit.to_dict() for habit in user.habits])
+        else:
+            return jsonify(error='User not found'), 404
 
 
     # register blueprint
@@ -62,8 +60,13 @@ def get_db_uri():
     
     return f"postgresql://{PG_USER}:{PG_PWD}@localhost/habits_db"
 
+from flask_cors import CORS
+
 def create_app() -> Flask:
     app = Flask(__name__)
+
+    # CORS(app, origins="localhost:3000, 127.0.0.1:3000")
+    CORS(app, origins="*")
     
     load_dotenv() 
     app.config['SQLALCHEMY_DATABASE_URI'] = get_db_uri() 

@@ -29,12 +29,11 @@ export type HabitsContainerProps = {
 }
 
 export const fetchHabits = async (startDate : Date, userId : string | null) => {
-    userId = null; 
-    const res = await fetch(
-        `https://localhost:5000/fetch-habits?startDate=${startDate}&userId=${userId}`
-    )
-    const json = await res.json();
-    console.log(json);
+  console.log("=== RECEIVED fetchHabits");
+  const res = await fetch(`http://127.0.0.1:5000/get-habits/1`);
+  const json = await res.json();
+  
+  return json;
 }
 
 const HabitsContainer: React.FC<HabitsContainerProps> = ({ startDate }) => {    
@@ -51,7 +50,9 @@ const HabitsContainer: React.FC<HabitsContainerProps> = ({ startDate }) => {
 
     useEffect(() => {
         console.log(`start date has changed to: ${startDate}`);
-        // fetch habits (startDate, userId = Null, )
+        const habits = fetchHabits(startDate, '1');
+        console.log(habits); 
+
     }, [startDate]);
 
     const deleteHabit = (id: number) => {
