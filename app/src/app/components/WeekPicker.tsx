@@ -1,3 +1,4 @@
+import next from 'next/types';
 import React, { useState, useEffect } from 'react';
 
 export type WeekPickerProps = {
@@ -10,6 +11,7 @@ const WeekPicker: React.FC<WeekPickerProps> = ({startDate, setStartDate}) => {
     const incrementWeek = () => {
         const nextStartDate = new Date(startDate);
         nextStartDate.setDate(nextStartDate.getDate() + 7);
+        console.log(nextStartDate);
         setStartDate(nextStartDate);
     }
 
@@ -22,7 +24,7 @@ const WeekPicker: React.FC<WeekPickerProps> = ({startDate, setStartDate}) => {
     return (
         <div>
             <button onClick={decrementWeek} >Previous</button>
-            <span> {startDate.getDate()} </span>
+            <span> Week of { startDate.toDateString() } </span>
             <button onClick={incrementWeek} >Next</button>
         </div>
     );

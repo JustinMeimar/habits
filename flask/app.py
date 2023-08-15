@@ -1,30 +1,84 @@
-from flask import Flask, request, jsonify
+from flask import Flask, Blueprint, request, jsonify
+import os
+import json
+from dotenv import load_dotenv 
+from database import db
+from models import User, HabitData, Habit, HabitType
+from datetime import datetime
 
-# from auth import *
+def install_routes(app: Flask):
 
-app = Flask(__name__, static_folder="../app/b")
-# app.config['SECRET_KEY'] = 'your_secret_key'
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  # Using SQLite for simplicity
+    app_bp = Blueprint('flask', __name__)
 
-# db.init_app(app)
-# login_manager.init_app(app)
+    @app_bp.route('/')
+    def index():
+        return "Hello, Flask"
 
-@app.route('/get-habits', methods=['GET'])
-def get_habits():
-    habit_id = request.args.get('habit_id', None)
-    date = request.args.get('date', None)
+    @app_bp.route('/insert-test-data', methods=['POST'])
+    def insert_test_data():
+        # #1,2023-08-15,{"2023-08-15": true, "2023-08-16": false}
+        # habit_id = 1
+        # start_date = "2023-08-15"
+        # data_string = "{\"2023-08-13\": true, \"2023-08-16\": false}"
+
+        # # Parse the date and JSON data
+        # start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
+        # data_json = json.loads(data_string)
+
+        # # Create a HabitData object
+        # habit_data = HabitData(habit_id=habit_id, start_date=start_date_obj, data=data_json)
+        # print(habit_data)
+
+        # # Add to session
+        # db.session.add(habit_data)
+
+        # # Commit the transaction
+        # db.session.commit()
+        # print("commited")
+
+        return "Habit data updated", 200       
+
+    @app_bp.route('/update-habits', methods=['POST']) 
+    def update_habits():
+        pass
+ 
+    @app_bp.route('/get-habits', methods=['GET'])
+    def get_habits():
+        habit_id = request.args.get('habit_id', None)
+        if habit_id == None:
+            habits = db.session.query(Habit)
+             
+        else: 
+            habit = db.session.query(Habit).filter_by(id=habit_id).first() 
+            return f"{str(habit.habit_title)}"
+
+
+    # register blueprint
+    app.register_blueprint(app_bp)
+
+def get_db_uri():
+    PG_USER = os.environ.get('PG_USER')
+    PG_PWD = os.environ.get('PG_PWD')
     
-    if habit_id is None or date is None:
-        return jsonify(error="Missing parameters"), 400
+    return f"postgresql://{PG_USER}:{PG_PWD}@localhost/habits_db"
+
+def create_app() -> Flask:
+    app = Flask(__name__)
     
-    return jsonify(date=date, habit_id=habit_id)
+    load_dotenv() 
+    app.config['SQLALCHEMY_DATABASE_URI'] = get_db_uri() 
 
-from flask import send_from_directory
+    db.init_app(app)
+    with app.app_context():
+        db.create_all()
 
-@app.route("/")
-def index():
-    return send_from_directory(app.static_folder, "index.html")
-    return "Hello, flask"
+    install_routes(app)
+
+    return app
+
+
+def insert_test_data_helper():
+    pass
 
 # from flask import Flask, render_template, redirect, url_for, flash
 # from flask_login import current_user, login_user, logout_user, login_required
@@ -68,4 +122,5 @@ def index():
 #     return "Hello, {}!".format(current_user.username)
 
 if __name__ == "__main__":
+    app = create_app()
     app.run(debug=True)

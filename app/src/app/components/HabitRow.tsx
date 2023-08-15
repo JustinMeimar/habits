@@ -37,8 +37,6 @@ const HabitRow: React.FC<HabitRowProps> = ({ habit, startDate}) => {
         }         
     }
 
-    const postRowData = () => {}
-
     const getWeekCount = (): number => {
         return habitsChecked.filter(checked => checked).length;
     };

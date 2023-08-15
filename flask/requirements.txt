@@ -1,4 +1,6 @@
 Flask==2.3.2
-Flask-SQLAlchemy==3.05
-FLask-WTF==1.1.15
+Flask-SQLAlchemy==3.0.5
+FLask-WTF==1.1.1
 FLask-Login==0.6.2
+python-dotenv==1.0.0
+psycopg2-binary==2.9.6

@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import HabitRow from './HabitRow';
 import HabitModal from './HabitModal';
 import WeekPicker from './WeekPicker';
-import { start } from 'repl';
 
 export enum HabitType {
     Boolean = "boolean",
@@ -25,19 +24,21 @@ export type HabitDesc = {
     type: HabitType,
 }
     
-const initializeStartDate = () : Date => {
-    const currentDate = new Date();
-    const dayOfWeek = currentDate.getDay();  
-    currentDate.setDate(currentDate.getDate() - dayOfWeek); 
-    currentDate.setHours(0, 0, 0, 0); 
-    return currentDate;
+export type HabitsContainerProps = {
+    startDate: Date
 }
 
-const HabitsContainer: React.FC = () => {    
-        
-    
-    const [startDate, setStartDate] = useState<Date>(initializeStartDate());
+export const fetchHabits = async (startDate : Date, userId : string | null) => {
+    userId = null; 
+    const res = await fetch(
+        `https://localhost:5000/fetch-habits?startDate=${startDate}&userId=${userId}`
+    )
+    const json = await res.json();
+    console.log(json);
+}
 
+const HabitsContainer: React.FC<HabitsContainerProps> = ({ startDate }) => {    
+        
     const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
     const [newHabitName, setNewHabitName] = useState<string>("");
     const [newHabitType, setNewHabitType] = useState<HabitType>(HabitType.Boolean);
@@ -47,6 +48,11 @@ const HabitsContainer: React.FC = () => {
         { id: 1, name: "Habit 1", type: HabitType.Boolean },
         { id: 2, name: "Habit 2", type: HabitType.Boolean },
     ]);
+
+    useEffect(() => {
+        console.log(`start date has changed to: ${startDate}`);
+        // fetch habits (startDate, userId = Null, )
+    }, [startDate]);
 
     const deleteHabit = (id: number) => {
         setHabits(habits.filter(habitDesc => { return habitDesc.id != id }));
@@ -102,9 +108,7 @@ const HabitsContainer: React.FC = () => {
         <div>
             This is the habit component
 
-            Sunday, Monday, Tuesday, Wednesday, Thursday, Friday
-            {<WeekPicker startDate={startDate} setStartDate={setStartDate}/>} 
-            
+            Sunday, Monday, Tuesday, Wednesday, Thursday, Friday            
             <button onClick={() => setModalIsOpen(true)}> Add Habbit </button>
             
             <HabitModal
