@@ -1,16 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 type HabitAtomProps = {
-    onToggle: () => void;
+    dateKey: string,  
+    atom: boolean | string | number;
+    editAtom: (dateKey : string, newVal: boolean | string | number) => void;
 };
 
-const HabitAtom: React.FC<HabitAtomProps> = ({ onToggle }) => {
-    const [checked, setChecked] = useState(false);
+const HabitAtom: React.FC<HabitAtomProps> = ({ dateKey, atom, editAtom }) => {
+    
+    const [atomType, setAtomType] = useState<any | null>(null);
 
     const handleClick = () => {
-        setChecked(!checked);
-        onToggle();
+        if (atom !== null) {
+            switch (atomType) {
+                case 'boolean':
+                    editAtom(dateKey, !atom); 
+                case 'number':
+                    return
+                case 'string':
+                    return;
+            }
+        }    
     }
+
+    useEffect(() => {
+        if (typeof atom === 'boolean') {
+            setAtomType('boolean');
+        } else if (typeof atom === 'number') {
+            setAtomType('number');
+        } else if (typeof atom === 'string') {
+            setAtomType('string');
+        }
+    }, [atom]);
+
+    const renderAtom = () => {
+        switch (atomType) {
+            case 'boolean':
+                return atom !== null ? (atom ? '✅' : '❌') : ' ';
+            case 'number':
+                return atom !== null ? atom.toString() : 'None';
+            case 'string':
+                return atom || 'None';
+            default:
+                return 'None'; // default case if the type is not recognized
+        }
+    } 
 
     return (
         <div 
@@ -25,7 +59,7 @@ const HabitAtom: React.FC<HabitAtomProps> = ({ onToggle }) => {
                 cursor: 'pointer'
             }} 
         >
-            {checked ? '✅' : '❌'}
+            {<div>{ renderAtom() }</div>}
         </div>
     );
 }

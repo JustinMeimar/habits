@@ -29,7 +29,7 @@ const HabitModal: React.FC<HabitModalProps> = ({
         <Modal
             isOpen={isOpen}
             onRequestClose={onFormRequestClose}
-            contentLabel="Add Habit Modal"
+            contentLabel={ editMode ? "Edit Habit" : "Add Habit"}
             ariaHideApp={false} 
             style={{
                 overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' },
@@ -46,7 +46,7 @@ const HabitModal: React.FC<HabitModalProps> = ({
                 }
             }}
         >
-            <h2>Add New Habit</h2>
+            <h2>{editMode ? "Edit Habit" : "Add New Habit"}</h2>
             <input
                 type="text"
                 placeholder="Habit Name"

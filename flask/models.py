@@ -8,7 +8,7 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    username = db.Column(db.String(30), nullable=False)
+    username = db.Column(db.String(30), nullable=False, unique=True)
     password_hash = db.Column(db.String(128)) 
     email = db.Column(db.String(75))
 
@@ -42,15 +42,16 @@ class Habit(db.Model):
     type_id = db.Column(db.Integer, db.ForeignKey('habit_type.id'))
 
     habit_title = db.Column(db.String(30)) 
-    habit_data = relationship('HabitData', backref='habit')
     
-    def to_dict(self):
+    habit_data = relationship('HabitData', backref='habit')
+    type_data = relationship('HabitType', backref='habit')
+
+    def get_habit_descriptor(self):
+        type_data = self.type_data.to_dict()
         return {
             'id': self.id,
-            'user_id': self.user_id,
-            'type_id': self.type_id,
-            'habit_title': self.habit_title,
-            'habit_data': [data.to_dict() for data in self.habit_data]
+            'title': self.habit_title,
+            'type': type_data['type'],
         }
 
 class HabitData(db.Model): 
@@ -58,6 +59,8 @@ class HabitData(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     habit_id = db.Column(db.Integer, db.ForeignKey('habit.id'))
+    
+    # the Sunday of the week 
     start_date = db.Column(db.Date)
     data = db.Column(JSON)
 
@@ -65,10 +68,8 @@ class HabitData(db.Model):
     Index('idx_date', start_date)
     Index('idx_habit_date', habit_id, start_date)
 
-    def to_dict(self):
+    def to_dict(self): 
         return {
-            'id': self.id,
-            'habit_id': self.habit_id,
             'start_date': self.start_date.isoformat(),
-            'data': self.data
+            'week_data': self.data
         }
