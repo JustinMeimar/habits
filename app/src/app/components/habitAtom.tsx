@@ -1,48 +1,62 @@
 import React, { useState, useEffect } from 'react';
+import { HabitType } from '../state/habitSlice';
 
 type HabitAtomProps = {
     dateKey: string,  
-    atom: boolean | string | number;
-    editAtom: (dateKey : string, newVal: boolean | string | number) => void;
+    atom: boolean | string| number | null;
+    type: HabitType;
+    editAtom: (dateKey : string, type: HabitType) => void; 
 };
 
-const HabitAtom: React.FC<HabitAtomProps> = ({ dateKey, atom, editAtom }) => {
+const HabitAtom: React.FC<HabitAtomProps> = ({ dateKey, atom, type, editAtom }) => {
     
-    const [atomType, setAtomType] = useState<any | null>(null);
+    // const [atomType, setAtomType] = useState<any | null>(null);
 
     const handleClick = () => {
-        if (atom !== null) {
-            switch (atomType) {
-                case 'boolean':
-                    editAtom(dateKey, !atom); 
-                case 'number':
-                    return
-                case 'string':
-                    return;
-            }
-        }    
+        console.log("click on:", type);
+        editAtom(dateKey, type);
     }
 
     useEffect(() => {
-        if (typeof atom === 'boolean') {
-            setAtomType('boolean');
-        } else if (typeof atom === 'number') {
-            setAtomType('number');
-        } else if (typeof atom === 'string') {
-            setAtomType('string');
-        }
+     
     }, [atom]);
 
     const renderAtom = () => {
-        switch (atomType) {
-            case 'boolean':
-                return atom !== null ? (atom ? '✅' : '❌') : '?';
-            case 'number':
-                return atom !== null ? atom.toString() : 'None';
-            case 'string':
+        switch (type) {
+            case HabitType.Boolean: {
+                return <div style={{
+                    width: '20px', 
+                    height: '20px',
+                    border: '1px solid grey',
+                    borderRadius: '3px',
+                    backgroundColor: atom !== null ? (atom ? '#97ed5a' : '#f0f0f0') : 'transparent',
+                }}>
+                </div>
+            }
+            case HabitType.Quantitative:
+                return <div style={{
+                    width: '20px', 
+                    height: '20px',
+                    border: '1px solid grey',
+                    borderRadius: '3px',
+                    backgroundColor: atom !== null ? '#b7fb95' : 'transparent',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center', 
+                }}>
+                    {atom}
+                </div>
+            case HabitType.Qualitative:
                 return atom || 'None';
             default:
-                return 'None'; // default case if the type is not recognized
+                return (
+                    <div className="habit-atom" style={{
+                        width: '20px', 
+                        height: '20px',
+                        border: '1px solid grey',
+                        borderRadius: '3px',
+                    }}></div>
+                ); // default case if the type is not recognized
         }
     } 
 
@@ -55,7 +69,6 @@ const HabitAtom: React.FC<HabitAtomProps> = ({ dateKey, atom, editAtom }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                borderRight: '1px solid black',
                 cursor: 'pointer'
             }} 
         >

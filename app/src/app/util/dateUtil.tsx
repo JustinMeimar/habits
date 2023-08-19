@@ -38,3 +38,12 @@ export const subtractWeeksFromString = (date: string, n: number): string => {
     const dateRepr = new Date(date);
     return subtractWeeksFromDate(dateRepr, n);
 };
+
+export const addDaysToDateString = (date: string, n: number): string => {
+    /**
+     * Add one day to the given date string and return the updated string.
+     */
+    const dateRepr = new Date(date);
+    dateRepr.setDate(dateRepr.getDate() + n);
+    return getDateString(dateRepr);
+};

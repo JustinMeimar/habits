@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import Modal from 'react-modal';
-import { HabitType } from './habitsContainer'
+// import { HabitType } from './habitsContainer'
+import { HabitType } from '../state/habitSlice';
 
 interface HabitModalProps {
     isOpen: boolean;

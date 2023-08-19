@@ -10,6 +10,8 @@ import { getDateString, getLastSundayFromDate, getLastSundayFromString, subtract
 import { HabitType } from '../state/habitSlice';
 import HabitModal from './habitModal';
 import HabitWeek from './habitWeek';
+import '../globals.css';
+import WeekHeader from './weekHeader';
 
 export const fetchHabits = async (startDate : Date, userId : string | null) => {
     /**
@@ -129,7 +131,6 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
         setNewHabitType(HabitType.Boolean);
     }
     
-    
     const onFormRequestClose = () => {
         setModalIsOpen(false);
         setEditMode(false);
@@ -138,32 +139,40 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
     }
 
     return (
-        <div className="habit-container">
-            <div>
-                <h1>Hello, {userName}</h1>
-                <button onClick={() => dispatch(increment())}>Increment</button>
-
-                <HabitModal
-                    isOpen={modalIsOpen}
-                    editMode={editMode}
-                    newHabitName={newHabitName}
-                    newHabitType={newHabitType}
-                    onFormNameChange={(name : string) => {setNewHabitName(name)}}
-                    onFormTypeChange={(type: HabitType) => {setNewHabitType(type)}}
-                    onFormSubmit={onFormSubmit}
-                    onFormRequestClose={onFormRequestClose}
-                />
-                <button onClick={() => setModalIsOpen(true)}> Add Habbit </button>
-
-                { habitStates.map((habit, idx) => (
-                    <div key={`habit-week-wrapper-${idx}`}> 
-                        <HabitWeek habit={habit} startDate={startDate}/>
-                        <button key={`delete-btn-${idx}`} onClick={() => {}}> Remove </button>
-                        <button key={`edit-btn-${idx}`} onClick={() => {}}> Edit </button>
+        <div className="habit-home">
+            <HabitModal
+                isOpen={modalIsOpen}
+                editMode={editMode}
+                newHabitName={newHabitName}
+                newHabitType={newHabitType}
+                onFormNameChange={(name : string) => {setNewHabitName(name)}}
+                onFormTypeChange={(type: HabitType) => {setNewHabitType(type)}}
+                onFormSubmit={onFormSubmit}
+                onFormRequestClose={onFormRequestClose}
+            />
+            <div className="habit-container">
+                <div>
+                    
+                    <br></br>
+                    {
+                        <WeekHeader startDate={startDate} />
+                    } 
+                    {habitStates.map((habit, idx) => (
+                    <div key={`habit-week-wrapper-${idx}`} className="habit-week-wrapper">
+                        <HabitWeek habit={habit} startDate={startDate} />
+                        <div className="button-wrapper">      
+                            {/* <div className="button" key={`delete-btn-${idx}`} onClick={() => {}}>
+                                ❌
+                            </div> */}
+                            <div className="button" key={`edit-btn-${idx}`} onClick={() => {}}>
+                            ✏️
+                            </div>
+                        </div>
                     </div>
-                ))}
+                    ))}
+                </div>
             </div>
-        </div>
+        </div> 
     );
 }
 

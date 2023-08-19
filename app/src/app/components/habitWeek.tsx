@@ -2,63 +2,75 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import HabitAtom from "./habitAtom";
 import { RootState } from '../state/store';
-import { HabitWeekData } from './habitsContainer';
 import { HabitWeekState } from '../state/habitSlice';
-import { invertBool } from '../state/habitSlice';
+import { invertBool, setQuantitative } from '../state/habitSlice';
+import "../globals.css";
+import { HabitState, addHabitWeek, HabitType } from '../state/habitSlice';
 
 type HabitRowProps = {
     habit: HabitState
     startDate: string
 };
 
-import { HabitState } from '../state/habitSlice';
-
-
 export const findHabitWeekByStartDate = (habitState: HabitState, startDate: string): HabitWeekState | null => {
-    console.log("findHabitWeekByStartDate:", startDate, habitState); 
     const weekData = habitState.weeks.find(
         (hs: HabitWeekState) => hs.startWeek === startDate
     );
-
+         
     return weekData || null;
 };
 
-
-
 const HabitWeek: React.FC<HabitRowProps> = ({ habit, startDate }) => {
     
-    const numDailyHabits: number = 7;    
     const [habitWeekData, setHabitWeekData] = useState<HabitWeekState>();
-  
     const habitStates = useSelector((state: RootState) => state.habits);
+    const dispatch = useDispatch(); 
     
     useEffect(() => {
-        
-        const weekData = findHabitWeekByStartDate(habit, startDate);        
+        console.log(habitStates);
+        let weekData : HabitWeekState | null = findHabitWeekByStartDate(habit, startDate);        
+        if (weekData === null) {
+            dispatch(addHabitWeek({habitId: habit.habitId, startWeek: startDate, data: undefined}));
+            weekData = findHabitWeekByStartDate(habit, startDate);
+        }
 
         if (weekData !== null) {
             setHabitWeekData(weekData);
         }
-
-        console.log("render habit week:", habitWeekData);
-
     }, [startDate, habitStates]);    
 
-    const dispatch = useDispatch(); 
-
-    const handleEditAtom = (dateKey: string, newVal : boolean | number | string) => {
+    const handleEditAtom = (dateKey: string, type: HabitType) => {
         // flip the boolean value
-        dispatch(invertBool({habitId: habit.habitId, weekKey: startDate, dayKey: dateKey}));
+        console.log("click on atom:", type)
+        switch (type) {
+            case HabitType.Boolean: {
+                console.log("handle edit boolean");
+                dispatch(invertBool({habitId: habit.habitId, weekKey: startDate, dayKey: dateKey}));
+                break;
+            }
+            case HabitType.Quantitative: {
+                console.log("handle edit quantitative");
+                console.log(habit.habitId, startDate, dateKey, 0);
+                dispatch(setQuantitative({habitId: habit.habitId, weekKey: startDate, dayKey: dateKey, value: 0}))    
+                break;
+            }
+            case HabitType.Qualitative: {
+                console.log("handle edit quantitative");    
+                break;
+            }
+            default: {
+                console.log("no match")
+            }
+        }
     }
 
     const renderHabitAtoms = () => {
         if (habitWeekData) {
             return Object.entries(habitWeekData.data).map(([key, value]) => (
-                <HabitAtom key={key} dateKey={key} atom={value} editAtom={handleEditAtom} />
+                <HabitAtom key={key} dateKey={key} atom={value} type={habit.habitType} editAtom={handleEditAtom} />
             ));
         } else {
-            const nullArray: null[] = Array(7).fill(null);
-            
+            const nullArray: null[] = Array(7).fill(null);   
             return nullArray.map((nullVal, idx) => (
                 <div 
                     style={{
@@ -70,20 +82,23 @@ const HabitWeek: React.FC<HabitRowProps> = ({ habit, startDate }) => {
                         borderRight: '1px solid black',
                         cursor: 'pointer'
                     }} 
-                >
-                    ?
+                > ?
                 </div>
-                // <HabitAtom key={`null-atom-${idx}`} dateKey={startDate}></HabitAtom>
-            ));
-            
+            )); 
         }
     }; 
 
     return (
-        <div>
-            <div style={{ display: 'flex', border: '1px solid black' }}>
-                { habit.title } 
-                { habit.habitType }
+        <div className="habit-week-container">
+            <div style={{ display: 'flex'}}>
+                <div className="habit-week-title-container">
+                    { habit.title } 
+                </div>
+                <div className="habit-week-type-container">
+                    { habit.habitType }
+                </div>
+            </div>
+            <div className="habit-week-atoms-container">
                 { renderHabitAtoms() }
             </div>
         </div>
