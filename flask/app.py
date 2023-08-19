@@ -46,7 +46,16 @@ def install_routes(app: Flask):
     @app_bp.route('/update-habits', methods=['POST']) 
     def update_habits():
         pass
-        
+
+    @app_bp.route('/get-user-habits/<int:user_id>')
+    def get_user_habits(user_id):
+
+        user = User.query.get(user_id)
+        if user:
+            return jsonify(
+                habits=[habit.get_all() for habit in user.habits]
+            )
+
     @app_bp.route('/get-habit-data/<int:habit_id>')
     def get_habit_data(habit_id):
         

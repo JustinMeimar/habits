@@ -54,6 +54,15 @@ class Habit(db.Model):
             'type': type_data['type'],
         }
 
+    def get_all(self):
+        type_data = self.type_data.to_dict()
+        return {
+            'id': self.id,
+            'title': self.habit_title,
+            'type': type_data['type'],
+            'weeks': [week.to_dict() for week in self.habit_data]
+        }
+
 class HabitData(db.Model): 
     __tablename__ = "habit_data"
 
