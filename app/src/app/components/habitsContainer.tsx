@@ -163,12 +163,11 @@ const HabitsContainer: React.FC<HabitsContainerProps> = ({ startDate }) => {
                 onFormSubmit={onFormSubmit}
                 onFormRequestClose={onFormRequestClose}
             />
-            {/*  weekData={getWeekData(habit, startDate)} */}
-            {habits.map(habit => (
-                <div>
-                    <HabitRow habit={habit} startDate={startDate} />
-                    <button onClick={() => deleteHabit(habit.id)}> Remove </button>
-                    <button onClick={() => editHabit(habit.id)}> Edit </button>
+            {habits.map((habit, idx) => (
+                <div key={`row-div-${idx}`}>
+                    <HabitRow key={`habit-row${idx}`} habit={habit} startDate={startDate} />
+                    <button key={`delete-btn-${idx}`} onClick={() => deleteHabit(habit.id)}> Remove </button>
+                    <button key={`edit-btn-${idx}`} onClick={() => editHabit(habit.id)}> Edit </button>
                 </div>
             ))}
         </div>

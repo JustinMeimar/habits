@@ -47,6 +47,20 @@ const invertBooleanState = (
     return;
 } 
 
+const addHabitState = (
+    state: HabitState[],
+    action: PayloadAction<HabitState>
+) => {
+    state.push(action.payload);
+}
+
+const setHabitStates = (
+    state: HabitState[], 
+    action: PayloadAction<HabitState[]>
+) => {
+    return action.payload;
+}
+
 /**
  * Habit Slice
  */
@@ -55,9 +69,11 @@ export const habitSlice = createSlice({
     initialState: initalState, 
     reducers: {
         invert: invertBooleanState,
+        addHabit: addHabitState, 
+        setHabits: setHabitStates,
     },
 });
 
-export const { invert } = habitSlice.actions;
+export const { invert, addHabit, setHabits } = habitSlice.actions;
 
 export default habitSlice.reducer
