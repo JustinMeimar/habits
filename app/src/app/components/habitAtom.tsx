@@ -36,7 +36,7 @@ const HabitAtom: React.FC<HabitAtomProps> = ({ dateKey, atom, editAtom }) => {
     const renderAtom = () => {
         switch (atomType) {
             case 'boolean':
-                return atom !== null ? (atom ? '✅' : '❌') : ' ';
+                return atom !== null ? (atom ? '✅' : '❌') : '?';
             case 'number':
                 return atom !== null ? atom.toString() : 'None';
             case 'string':

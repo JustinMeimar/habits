@@ -4,15 +4,18 @@ import React, { useState, useEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { increment } from '../state/counterSlice';
-import { addHabit, setHabits, HabitState } from '../state/habitSlice';
+import { addHabit, setHabits, HabitState, HabitWeekState } from '../state/habitSlice';
 import { RootState } from '../state/store'
 import { getDateString, getLastSundayFromDate, getLastSundayFromString, subtractWeeksFromString } from '../util/dateUtil';
+import { HabitType } from '../state/habitSlice';
+import HabitModal from './habitModal';
+import HabitWeek from './habitWeek';
 
 export const fetchHabits = async (startDate : Date, userId : string | null) => {
     /**
      * Fetch an array of habit descriptors for the user logged in.
      */
-    const res = await fetch(`http://127.0.0.1:5000/get-habit-descriptors/1`);
+    const res = await fetch(`http://127.0.0.1:5000/get-user-habits/1`);
     const json = await res.json();
     
     return json;
@@ -33,68 +36,132 @@ export const fetchHabitData = async (habitId: number, startDateRange: Date, endD
     return await res.json();
 }
 
-const HabitsHome: React.FC = () => {    
+export const parseHabitData = (data: any) : HabitState => {
+    const habitState: HabitState = {
+        title: data.title, 
+        habitId: data.id,
+        habitType: data.type,
+        weeks: data.weeks.map((week: any) : HabitWeekState => {
+            return {
+                startWeek: week.start_date,
+                data: week.week_data
+            }
+        })
+    };
+    return habitState
+}
+
+export type HabitsHomeProps = {
+    startDate: string
+}
+
+
+const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {    
     
     // Get the count from the Redux state
-    const count = useSelector((state: RootState) => state.counter.count);
     const userName = useSelector((state: RootState) => state.user.username);
     const habitStates = useSelector((state: RootState) => state.habits);
-
-    // get data from last ten weeks
-    const endDateRange = getLastSundayFromDate(new Date());
-    const startDateRange = subtractWeeksFromString(endDateRange, 10);
+    
+    // container vars
+    const [newHabitName, setNewHabitName] = useState<string>("");
+    const [newHabitType, setNewHabitType] = useState<HabitType>(HabitType.Boolean); 
+    const [editMode, setEditMode] = useState<boolean>(false);
+    const [editHabitId, setEditHabitId] = useState<number>(-1);
+    const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
 
     useEffect(() => {
-
-        console.log(startDateRange, endDateRange);
-        console.log("habitStates before fetch:", habitStates);
-
-        const fetchedHabits = fetchHabits(new Date(startDateRange), "1").then((response) => {
-            response.habits.map((hab: any) => {
-                console.log(hab)
-                const habitState: HabitState = {
-                    title: hab.title,
-                    habitId: hab.id,
-                    habitType: hab.type,
-                    weeks: []
-                };
-                /**
-                 export enum HabitType {
-                    Boolean = "boolean",
-                    Qualitative = "qualitative",
-                    Quantiative = "quantiative"
-                };
-
-                export type HabitWeekState = {
-                    startWeek: Date,
-                    data: Record<string, boolean | string | number>
-                };
-
-                export type HabitState = {
-                    title: string, 
-                    habitId: string, 
-                    habitType: HabitType, 
-                    weeks: HabitWeekState[]; 
-                };
-
-                 */
-                
-                dispatch(addHabit(habitState));
-            })
-            console.log("habitStates after fetch:", habitStates);
-        }); 
+        loadHabitsOnInit();
     }, [])
 
     // Get the dispatch function
     const dispatch = useDispatch();
+    
+    const loadHabitsOnInit = () => {
+        // make function idempotent
+        if (habitStates.length > 0) {
+            return;
+        }
+
+        // make all the data present
+        const endDateRange = getLastSundayFromDate(new Date());
+        const startDateRange = subtractWeeksFromString(endDateRange, 10);
+        
+        fetchHabits(new Date(startDateRange), "1").then((response) => {
+            const habitStateArr: HabitState[] = []; 
+            response.habits.map((hab: any) => {
+                const parsedData = parseHabitData(hab); 
+                habitStateArr.push(parsedData);
+            })
+            console.log(habitStateArr);
+            dispatch(setHabits(habitStateArr));
+        }); 
+    }
+ 
+    const deleteHabit = (id: number) => {
+        // TODO: delete a habit
+    }
+
+    const editHabit = (id: number) => {
+        // TODO: edit a habit 
+
+        // setNewHabitType(habit.type);
+        // setNewHabitName(habit.name);
+        // setEditHabitId(habit.id)
+        setEditMode(true);
+        setModalIsOpen(true);
+    }
+
+    const onFormSubmit = () => { 
+        if (editMode) {
+            // TODO: handle edit submit form
+        } else {
+            console.log("submitted in add mode");
+            const newHabit : HabitState = {
+                habitId: (habitStates.length + 1).toString(), 
+                title: newHabitName, 
+                habitType: newHabitType, 
+                weeks: []
+            };
+            dispatch(addHabit(newHabit));
+        }
+        setModalIsOpen(false);
+        setNewHabitName("");
+        setNewHabitType(HabitType.Boolean);
+    }
+    
+    
+    const onFormRequestClose = () => {
+        setModalIsOpen(false);
+        setEditMode(false);
+        setNewHabitName("");
+        setNewHabitType(HabitType.Boolean);
+    }
 
     return (
-        <div className="redux-container">
-            This is the habits home
+        <div className="habit-container">
             <div>
                 <h1>Hello, {userName}</h1>
-                <h1>Count: {count}</h1>
                 <button onClick={() => dispatch(increment())}>Increment</button>
+
+                <HabitModal
+                    isOpen={modalIsOpen}
+                    editMode={editMode}
+                    newHabitName={newHabitName}
+                    newHabitType={newHabitType}
+                    onFormNameChange={(name : string) => {setNewHabitName(name)}}
+                    onFormTypeChange={(type: HabitType) => {setNewHabitType(type)}}
+                    onFormSubmit={onFormSubmit}
+                    onFormRequestClose={onFormRequestClose}
+                />
+                <button onClick={() => setModalIsOpen(true)}> Add Habbit </button>
+
+                { habitStates.map((habit, idx) => (
+                    <div key={`habit-week-wrapper-${idx}`}> 
+                        <HabitWeek habit={habit} startDate={startDate}/>
+                        <button key={`delete-btn-${idx}`} onClick={() => {}}> Remove </button>
+                        <button key={`edit-btn-${idx}`} onClick={() => {}}> Edit </button>
+                    </div>
+                ))}
             </div>
         </div>
     );

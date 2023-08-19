@@ -18,6 +18,7 @@ const initializeStartDate = () : Date => {
     return currentDate;
 }
 
+import { getDateString } from './util/dateUtil';
 export default function Home() {
     
   const [startDate, setStartDate] = useState<Date>(initializeStartDate());
@@ -25,8 +26,8 @@ export default function Home() {
   return (
     <main className="">
       <Provider store={store}>
-        <HabitsHome/> 
         {<WeekPicker startDate={startDate} setStartDate={setStartDate} />}
+        {<HabitsHome startDate={getDateString(startDate)} />} 
         {<HabitsContainer startDate={startDate}/>}
       </Provider> 
     </main>

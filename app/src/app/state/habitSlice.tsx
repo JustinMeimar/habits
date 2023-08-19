@@ -11,7 +11,7 @@ export enum HabitType {
 };
 
 export type HabitWeekState = {
-    startWeek: Date,
+    startWeek: string,
     data: Record<string, boolean | string | number>
 };
 
@@ -29,21 +29,27 @@ const initalState: HabitState[] = [];
  */
 const invertBooleanState = (
     state: HabitState[], 
-    action: PayloadAction<{ habitId: string; weekIndex: number; dateKey: string}>  
+    action: PayloadAction<{ habitId: string; weekKey: string; dayKey: string}>  
 ) => {
-    const { habitId, weekIndex, dateKey } = action.payload;
+    const { habitId, weekKey, dayKey } = action.payload;
 
     // find the habit by habitId
     const habitIndex: number = state.findIndex((hs) => hs.habitId === habitId);
     if (habitIndex === -1) return;
 
-    // find the week in the habit by weekIndex
-    const week : HabitWeekState = state[habitIndex].weeks[weekIndex];
-    if (!week || week.data[dateKey] === undefined) return;
+    // Find the week in the habit by weekKey
+    const weekIndex = state[habitIndex].weeks.findIndex((week) => week.startWeek === weekKey);
+    if (weekIndex === -1) return;
 
-    // set the boolean at dateKey to its inverse
-    week.data[dateKey] = !week.data[dateKey];
+    // Find the week data by weekIndex
+    const week: HabitWeekState = state[habitIndex].weeks[weekIndex];
 
+    // Check if the dayKey exists in the week data
+    if (week.data[dayKey] === undefined) return;
+
+    // Set the boolean at dayKey to its inverse
+    week.data[dayKey] = !week.data[dayKey];
+    
     return;
 } 
 
@@ -68,12 +74,12 @@ export const habitSlice = createSlice({
     name: 'habits',
     initialState: initalState, 
     reducers: {
-        invert: invertBooleanState,
+        invertBool: invertBooleanState,
         addHabit: addHabitState, 
         setHabits: setHabitStates,
     },
 });
 
-export const { invert, addHabit, setHabits } = habitSlice.actions;
+export const { invertBool, addHabit, setHabits } = habitSlice.actions;
 
 export default habitSlice.reducer

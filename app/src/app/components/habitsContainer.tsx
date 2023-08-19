@@ -51,11 +51,12 @@ export const fetchHabitData = async (habitId: number, startDateRange: Date, endD
 
 const HabitsContainer: React.FC<HabitsContainerProps> = ({ startDate }) => {    
         
-    const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
     const [newHabitName, setNewHabitName] = useState<string>("");
-    const [newHabitType, setNewHabitType] = useState<HabitType>(HabitType.Boolean);
+    const [newHabitType, setNewHabitType] = useState<HabitType>(HabitType.Boolean); 
     const [editMode, setEditMode] = useState<boolean>(false);
     const [editHabitId, setEditHabitId] = useState<number>(-1);
+    const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+    
     const [habits, setHabits] = useState<HabitDescriptor[]>([]);
 
     const startDateRange = new Date('2023-07-02');
@@ -91,6 +92,8 @@ const HabitsContainer: React.FC<HabitsContainerProps> = ({ startDate }) => {
             
     }, [startDate]);
 
+    const count = useSelector((state: any) => state.counter.count);
+    
     const deleteHabit = (id: number) => {
         setHabits(habits.filter(habitDesc => { return habitDesc.id != id }));
     }
@@ -137,7 +140,6 @@ const HabitsContainer: React.FC<HabitsContainerProps> = ({ startDate }) => {
         setNewHabitType(HabitType.Boolean);
     }
     
-    const count = useSelector((state: any) => state.counter.count);
     
     const onFormRequestClose = () => {
         setModalIsOpen(false);
