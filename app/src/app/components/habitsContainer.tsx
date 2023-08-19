@@ -1,9 +1,9 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import HabitRow from './HabitRow';
-import HabitModal from './HabitModal';
-import WeekPicker from './WeekPicker';
+import HabitRow from './habitRow';
+import HabitModal from './habitModal';
+import { useSelector, useDispatch } from 'react-redux';
 
 export enum HabitType {
     Boolean = "boolean",
@@ -137,6 +137,8 @@ const HabitsContainer: React.FC<HabitsContainerProps> = ({ startDate }) => {
         setNewHabitType(HabitType.Boolean);
     }
     
+    const count = useSelector((state: any) => state.counter.count);
+    
     const onFormRequestClose = () => {
         setModalIsOpen(false);
         setEditMode(false);
@@ -147,7 +149,7 @@ const HabitsContainer: React.FC<HabitsContainerProps> = ({ startDate }) => {
     return (
         <div className="habit-container">
             This is the habit component
-
+            <h2> {count} </h2> 
             Sunday, Monday, Tuesday, Wednesday, Thursday, Friday            
             <button onClick={() => setModalIsOpen(true)}> Add Habbit </button>
             

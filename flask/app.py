@@ -20,10 +20,7 @@ def install_routes(app: Flask):
     def insert_test_data():
         habit_id = 1
         
-        # Start from the first Sunday in July, 2023 (July 2nd)
         start_date_obj = datetime.strptime("2023-07-02", '%Y-%m-%d')
-        
-        # End on the most recent Sunday in August, 2023 (August 13th)
         end_date_obj = datetime.strptime("2023-08-13", '%Y-%m-%d')
 
         while start_date_obj <= end_date_obj:
@@ -37,11 +34,7 @@ def install_routes(app: Flask):
             # Create a HabitData object
             habit_data = HabitData(habit_id=habit_id, start_date=start_date_obj, data=data_json)
             print(habit_data)
-
-            # Add to session
             db.session.add(habit_data)
-
-            # Move to the next Sunday
             start_date_obj += timedelta(weeks=1)
 
         # Commit the transaction
@@ -49,27 +42,6 @@ def install_routes(app: Flask):
         print("committed")
 
         return "Habit data updated", 200
-        # #1,2023-08-15,{"2023-08-15": true, "2023-08-16": false}
-        # habit_id = 1
-        # start_date = "2023-08-13"
-        # data_string = "{\"2023-08-13\": true, \"2023-08-16\": false}"
-
-        # # Parse the date and JSON data
-        # start_date_obj = datetime.strptime(start_date, '%Y-%m-%d')
-        # data_json = json.loads(data_string)
-
-        # # Create a HabitData object
-        # habit_data = HabitData(habit_id=habit_id, start_date=start_date_obj, data=data_json)
-        # print(habit_data)
-
-        # # Add to session
-        # db.session.add(habit_data)
-
-        # # Commit the transaction
-        # db.session.commit()
-        # print("commited")
-
-        # return "Habit data updated", 200       
 
     @app_bp.route('/update-habits', methods=['POST']) 
     def update_habits():

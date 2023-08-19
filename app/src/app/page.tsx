@@ -1,7 +1,10 @@
 "use client"
 import React, { useState } from 'react'
-import HabitsContainer from './components/HabitsContainer'
-import WeekPicker from './components/WeekPicker';
+import HabitsContainer from './components/habitsContainer'
+import WeekPicker from './components/weekPicker';
+import store from './state/store'
+import { Provider } from 'react-redux'
+import HabitsHome from './components/habitsHome'
 
 const initializeStartDate = () : Date => {
     /** 
@@ -21,8 +24,67 @@ export default function Home() {
 
   return (
     <main className="">
-      {<WeekPicker startDate={startDate} setStartDate={setStartDate} />}
-      {<HabitsContainer startDate={startDate}/>}
+      <Provider store={store}>
+        <HabitsHome/> 
+        {<WeekPicker startDate={startDate} setStartDate={setStartDate} />}
+        {<HabitsContainer startDate={startDate}/>}
+      </Provider> 
     </main>
   )
 }
+
+
+// redux state architecutre
+/*
+
+[
+  {
+    "user_id": 1, 
+    "habit_id": 1, 
+    "habit_data": {
+      start_date: "2023-11-13",
+      week_data: {
+        "2023-11-13": True,
+        "2023-11-14": True,
+        "2023-11-15": True,
+        "2023-11-16": False,
+        "2023-11-18": True,
+        "2023-11-19": False,
+        "2023-11-20": True,
+      }
+    }
+  },
+  {
+    "user_id": 1, 
+    "habit_id": 2, 
+    "habit_data": {
+      start_date: "2023-11-13",
+      week_data: {
+        "2023-11-13": True,
+        "2023-11-14": True,
+        "2023-11-15": True,
+        "2023-11-16": False,
+        "2023-11-18": True,
+        "2023-11-19": False,
+        "2023-11-20": True,
+      }
+    }
+  },
+  {
+    "user_id": 2, 
+    "habit_id": 1, 
+    "habit_data": {
+      start_date: "2023-11-13",
+      week_data: {
+        "2023-11-13": True,
+        "2023-11-14": True,
+        "2023-11-15": True,
+        "2023-11-16": False,
+        "2023-11-18": True,
+        "2023-11-19": False,
+        "2023-11-20": True,
+      }
+    }
+  },
+]
+*/

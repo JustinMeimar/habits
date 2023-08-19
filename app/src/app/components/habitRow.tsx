@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import HabitAtom from "./HabitAtom";
-import { HabitDescriptor, HabitWeekData } from "./HabitsContainer";
+import HabitAtom from "./habitAtom";
+import { HabitDescriptor, HabitWeekData } from "./habitsContainer";
 
 type HabitRowProps = {
     habit: HabitDescriptor;
