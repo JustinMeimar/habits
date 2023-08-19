@@ -1,45 +1,9 @@
-## PLANNING
+# Habits
 
+A habit tracker.
 
-model Habit
-    - Type
+Made with Next.js, flask and Postgres. 
 
-Tables:
-- Habit
-- User
-(maybe oauth stuff for google login)
+East to host on a homeserver for access anywhere
 
-Table Habit:
-    - Habit
-
-
-Habit table indexes
-    - week_no
-    - user
-
-    Habit;
-        - id
-        - user_id
-        - habit_d
-
-        - HabitState (FK)
-
-    HabitState<boolean>: 
-        - id (PK)
-        - week_no
-        - year
-        - day
-        - data: {
-            "active" : False    
-        }
-    
-    HabitState<quantitative>:
-        - id (PK)
-        - week_no
-        - year
-        - day
-        - data: {
-            ""
-        }
-
-
+<img src="doc/habits.png" alt="Alternative Text: PNG could not load" height="400" />
