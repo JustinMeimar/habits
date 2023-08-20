@@ -30,7 +30,7 @@ const HabitModal: React.FC<HabitModalProps> = ({
             contentLabel={"Add Habit"}
             ariaHideApp={false} 
             style={{
-                overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' },
+                overlay: { backgroundColor: 'rgba(0, 0, 0, 0.20)' },
                 content: {
                     top: '50%',
                     left: '50%',
@@ -40,7 +40,8 @@ const HabitModal: React.FC<HabitModalProps> = ({
                     transform: 'translate(-50%, -50%)',
                     padding: '20px',
                     width: '400px',
-                    background: '#fff'
+                    background: '#fff',
+                    borderRadius: '10px',
                 }
             }}
         >

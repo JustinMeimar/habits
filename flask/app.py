@@ -6,7 +6,24 @@ from database import db
 from models import User, HabitData, Habit, HabitType
 from datetime import datetime, timedelta
 from sqlalchemy import and_
+from sqlalchemy.orm.attributes import flag_modified
 import random
+from enum import Enum
+
+class HabitType(Enum):
+    Boolean = 1
+    Qualitative = 2
+    Quantitative = 3
+
+def get_type_id(type_string: str) -> int:
+    match (type_string):
+        case "boolean":
+            return HabitType.Boolean
+        case "quantitative":
+            return HabitType.Quantitative
+        case "qualitative":
+            return HabitType.Qualitative
+    return None
 
 def install_routes(app: Flask):
 
@@ -14,41 +31,82 @@ def install_routes(app: Flask):
 
     @app_bp.route('/')
     def index():
-        return "Hello, Flask"
+        return "login here D:"
 
-    @app_bp.route('/insert-test-data', methods=['POST'])
-    def insert_test_data():
-        habit_id = 1
+    @app_bp.route('/api/add-habit/<int:user_id>', methods=['POST'])
+    def add_habit(user_id):
+        new_habit_json = request.json.get('habit')
+
+        response = {'ok': False}
+
+        user = User.query.get(user_id)
+        if user:
+            try:
+                habit_id = new_habit_json['habitId']
+                habit_title = new_habit_json['title']
+                habit_type = get_type_id(new_habit_json['habitType'])
+
+                assert habit_type is not None 
+
+                new_habit = Habit(user_id=user.id, type_id=habit_type, habit_title=habit_title)
+                db.session.add(new_habit)
+
+                start_date = new_habit_json['weeks'][0]['startWeek']
+                json_data = new_habit_json['weeks'][0]['data']
+                
+                newHabitData = HabitData(habit_id=habit_id, start_date=start_date, data=json_data)
+                db.session.add(newHabitData)
+
+                db.session.commit()
+                response['ok'] = True
+
+            except Exception as e:
+                print(f"ecountered error: {e}")
+                db.session.rollback()
+        else:
+            response['meessage'] = f"user {user_id} does not exist"
+        return jsonify(response)
+
+
+    @app_bp.route('/api/update-atom/<int:user_id>/<int:habit_id>', methods=['POST'])
+    def update_habit_atom(user_id, habit_id):
         
-        start_date_obj = datetime.strptime("2023-07-02", '%Y-%m-%d')
-        end_date_obj = datetime.strptime("2023-08-13", '%Y-%m-%d')
+        weekKey = request.args.get(key="week-key")
+        dayKey = request.args.get(key="day-key") 
+        newValue = request.json.get('value')
 
-        while start_date_obj <= end_date_obj:
-            # Generate random boolean data for the week
-            data_json = {}
-            for i in range(7): # 7 days in a week
-                day = start_date_obj + timedelta(days=i)
-                day_str = day.strftime('%Y-%m-%d')
-                data_json[day_str] = bool(random.getrandbits(1)) # random boolean
+        response = {"ok": False}
 
-            # Create a HabitData object
-            habit_data = HabitData(habit_id=habit_id, start_date=start_date_obj, data=data_json)
-            print(habit_data)
-            db.session.add(habit_data)
-            start_date_obj += timedelta(weeks=1)
+        user = User.query.get(user_id)
+        if user: 
+            habit_data = HabitData.query.filter_by(
+                habit_id=habit_id, start_date=weekKey
+            ).first()
 
-        # Commit the transaction
-        db.session.commit()
-        print("committed")
+            if habit_data: 
+                try:
+                    print("Before update:", habit_data.data)
+                    
+                    dataCopy = habit_data.data
+                    dataCopy[dayKey] = newValue 
+                    habit_data.data = dataCopy
 
-        return "Habit data updated", 200
+                    flag_modified(habit_data, 'data') 
+                    db.session.commit()
+                    
+                    print("aftter update:", habit_data.data)
 
-    @app_bp.route('/update-habits', methods=['POST']) 
-    def update_habits():
-        pass
+                    response['ok'] = True
+                except Exception as e:
+                    db.session.rollback()
+                    print("An error occurred:", e)
+        
+        return jsonify(response)
 
-    @app_bp.route('/get-user-habits/<int:user_id>')
+    @app_bp.route('/api/get-user-habits/<int:user_id>')
     def get_user_habits(user_id):
+
+        startDate = request.args.get(key="start-date")
 
         user = User.query.get(user_id)
         if user:
@@ -56,7 +114,7 @@ def install_routes(app: Flask):
                 habits=[habit.get_all() for habit in user.habits]
             )
 
-    @app_bp.route('/get-habit-data/<int:habit_id>')
+    @app_bp.route('/api/get-habit-data/<int:habit_id>')
     def get_habit_data(habit_id):
         
         start_week = request.args.get(key="start-week")
@@ -78,19 +136,6 @@ def install_routes(app: Flask):
         result = [hd.to_dict() for hd in habit_data]
 
         return jsonify(result)
-
-    @app_bp.route('/get-habit-descriptors/<int:user_id>', methods=['GET'])
-    def get_habits(user_id):
-        page = request.args.get(key='page', default=1, type=int)
-        per_page = request.args.get(key='per_page', default=3, type=int)
-
-        user = User.query.get(user_id)
-        if user:
-            return jsonify(
-                habits=[habit.get_habit_descriptor() for habit in user.habits]
-            )
-        else:
-            return jsonify(error='User not found'), 404
 
     # register blueprint
     app.register_blueprint(app_bp)
@@ -119,10 +164,6 @@ def create_app() -> Flask:
     install_routes(app)
 
     return app
-
-
-def insert_test_data_helper():
-    pass
 
 # from flask import Flask, render_template, redirect, url_for, flash
 # from flask_login import current_user, login_user, logout_user, login_required

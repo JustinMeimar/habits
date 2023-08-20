@@ -5,14 +5,14 @@ export type UserState = {
     email: string
 }
 
-const initalState: UserState = {
+const initialState: UserState = {
     username: "fifferfaffer", 
     email: "justin@meimar.com"
 };
 
 export const userSlice = createSlice({
   name: 'counter',
-  initialState: initalState, 
+  initialState: initialState, 
   reducers: {},
 });
 

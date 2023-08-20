@@ -5,6 +5,7 @@ import store from './state/store'
 import { Provider } from 'react-redux'
 import HabitsHome from './components/habitsHome'
 import HomeHeader from './components/homeHeader';
+import { getDateString } from './util/dateUtil';
 
 const initializeStartDate = () : Date => {
     /** 
@@ -18,8 +19,6 @@ const initializeStartDate = () : Date => {
     return currentDate;
 }
 
-import { getDateString } from './util/dateUtil';
-
 export default function Home() {
     
   const [startDate, setStartDate] = useState<Date>(initializeStartDate());
@@ -28,14 +27,6 @@ export default function Home() {
     <main className="">
       <Provider store={store}>
         {<HomeHeader/>}
-            {/* <div className="habit-menu-buttons">
-                <div className="add-habit-button" key="add-habit-button" onClick={() => {setModalIsOpen(true)}}>
-                    Add
-                </div> 
-                <div className="remove-habit-button" key={`remove-habit-button`} onClick={() => {}}>
-                    Remove
-                </div>
-            </div> */}
         {<WeekPicker startDate={startDate} setStartDate={setStartDate} />}
         {<HabitsHome startDate={getDateString(startDate)}/>} 
       </Provider> 

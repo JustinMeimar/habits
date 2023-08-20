@@ -3,40 +3,19 @@
 import React, { useState, useEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { increment } from '../state/counterSlice';
-import { addHabit, setHabits, HabitState, HabitWeekState } from '../state/habitSlice';
-import { RootState } from '../state/store'
-import { getDateString, getLastSundayFromDate, getLastSundayFromString, subtractWeeksFromString } from '../util/dateUtil';
-import { HabitType } from '../state/habitSlice';
-import HabitModal from './habitModal';
-import HabitWeek from './habitWeek';
-import '../globals.css';
+import { addHabit, setHabits, HabitState, HabitWeekState } from '@/app/state/habitSlice';
+import { AppDispatch, RootState } from '@/app/state/store'
+import { HabitType } from '@/app/state/habitSlice';
+import { getLastSundayFromDate, subtractWeeksFromString } from '@/app/util/dateUtil';
+import { fetchHabits } from '@/app/api/request';
+import { addNewHabitThunk } from '@/app/state/habitThunk';
+import { addDaysToDateString } from '@/app/util/dateUtil';
+
 import WeekHeader from './calendar/weekHeader';
+import HabitWeek from './habitWeek';
+import HabitModal from './habitModal';
 
-export const fetchHabits = async (startDate : Date, userId : string | null) => {
-    /**
-     * Fetch an array of habit descriptors for the user logged in.
-     */
-    const res = await fetch(`http://127.0.0.1:5000/get-user-habits/1`);
-    const json = await res.json();
-    
-    return json;
-}
-
-export const fetchHabitData = async (habitId: number, startDateRange: Date, endDateRange: Date) => {
-    /**
-     * Fetch an array of HabitWeeks for a given habitId over the date range given. 
-     */
-    const startDateStr: string = startDateRange.toDateString(); 
-    const endDateStr: string = endDateRange.toDateString(); 
-    
-    const url = 'http://127.0.0.1:5000'
-    const res = await fetch(
-        `${url}/get-habit-data/${habitId}?start-week=${startDateStr}&end-week=${endDateStr}`
-    );
-
-    return await res.json();
-}
+import '../globals.css';
 
 export const parseHabitData = (data: any) : HabitState => {
     const habitState: HabitState = {
@@ -53,15 +32,41 @@ export const parseHabitData = (data: any) : HabitState => {
     return habitState
 }
 
+
+export const getUninitializedHabitWeek = (habitType: HabitType) : HabitWeekState => {
+    
+    // let fillData: number | string | boolean; 
+
+    // switch (habitType) {
+    //     case HabitType.Boolean:
+    //         fillData = false; break;
+    //     case HabitType.Quantitative:
+    //         fillData = 0; break;
+    //     case HabitType.Qualitative:
+    //         fillData = ''; break;
+    // }
+    
+    const startDate : string = getLastSundayFromDate(new Date());
+    const defaultData: Record<string, boolean | string | number | null> = {}; 
+    
+    for (let i = 0; i < 7; i++) {
+        const dateKey = addDaysToDateString(startDate, i);
+        defaultData[dateKey] = null;
+    }
+
+    return {
+        startWeek: startDate,
+        data: defaultData 
+    };
+} 
+
 export type HabitsHomeProps = {
     startDate: string
 }
 
-
 const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {    
     
     // Get the count from the Redux state
-    const userName = useSelector((state: RootState) => state.user.username);
     const habitStates = useSelector((state: RootState) => state.habits);
     
     // container vars
@@ -71,10 +76,10 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
 
     useEffect(() => {
         loadHabitsOnInit();
-    }, [])
+    }, [habitStates])
 
     // Get the dispatch function
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     
     const loadHabitsOnInit = () => {
         // make function idempotent
@@ -92,7 +97,6 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
                 const parsedData = parseHabitData(hab); 
                 habitStateArr.push(parsedData);
             })
-            console.log(habitStateArr);
             dispatch(setHabits(habitStateArr));
         }); 
     }
@@ -113,10 +117,10 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
             habitId: (habitStates.length + 1).toString(), 
             title: newHabitName, 
             habitType: newHabitType, 
-            weeks: []
+            weeks: [getUninitializedHabitWeek(newHabitType)]
         };
-        dispatch(addHabit(newHabit));
-        
+        dispatch(addNewHabitThunk({habit: newHabit}));        
+
         setModalIsOpen(false);
         setNewHabitName("");
         setNewHabitType(HabitType.Boolean);

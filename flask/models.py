@@ -54,7 +54,7 @@ class Habit(db.Model):
             'type': type_data['type'],
         }
 
-    def get_all(self):
+    def get_all(self, startDate=None):
         type_data = self.type_data.to_dict()
         return {
             'id': self.id,
@@ -77,6 +77,7 @@ class HabitData(db.Model):
     Index('idx_date', start_date)
     Index('idx_habit_date', habit_id, start_date)
 
+    # def get_conditional
     def to_dict(self): 
         return {
             'start_date': self.start_date.isoformat(),

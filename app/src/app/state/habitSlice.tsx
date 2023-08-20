@@ -1,6 +1,7 @@
 // habitSlice.tsx
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { addDaysToDateString } from '../util/dateUtil';
+import { setAtomStateThunk } from './habitThunk';
 
 /**
  * Types
@@ -23,31 +24,58 @@ export type HabitState = {
     weeks: HabitWeekState[]; 
 };
 
-const initalState: HabitState[] = [];
+const initialState: HabitState[] = [];
+
+
+export const findHabitIndex = (state: HabitState[],habitId: string) : number => {
+    const habitIndex: number = state.findIndex((hs) => hs.habitId === habitId);
+    return habitIndex;
+}
 
 /**
  * Reducers
  */
-const invertBooleanState = (
+const setAtomState = (
     state: HabitState[], 
-    action: PayloadAction<{ habitId: string; weekKey: string; dayKey: string}>  
+    action: PayloadAction<{ 
+        habitId: string; 
+        weekKey: string; 
+        dayKey: string, 
+        value: boolean | string | number}>  
 ) => {
-    const { habitId, weekKey, dayKey } = action.payload;
+    const { habitId, weekKey, dayKey, value } = action.payload;
 
-    // find the habit by habitId
     const habitIndex: number = state.findIndex((hs) => hs.habitId === habitId);
     if (habitIndex === -1) return;
 
-    // Find the week in the habit by weekKey
     const weekIndex = state[habitIndex].weeks.findIndex((week) => week.startWeek === weekKey);
     if (weekIndex === -1) return;
 
     const week: HabitWeekState = state[habitIndex].weeks[weekIndex];
     if (week.data[dayKey] === undefined) return;
 
-    week.data[dayKey] = !week.data[dayKey]; 
+    week.data[dayKey] = value;
     return;
-} 
+}
+
+const setBooleanState = (
+    state: HabitState[], 
+    action: PayloadAction<{ habitId: string; weekKey: string; dayKey: string, value: boolean}>  
+) => {
+    const { habitId, weekKey, dayKey, value } = action.payload;
+
+    const habitIndex: number = state.findIndex((hs) => hs.habitId === habitId);
+    if (habitIndex === -1) return;
+
+    const weekIndex = state[habitIndex].weeks.findIndex((week) => week.startWeek === weekKey);
+    if (weekIndex === -1) return;
+
+    const week: HabitWeekState = state[habitIndex].weeks[weekIndex];
+    if (week.data[dayKey] === undefined) return;
+
+    week.data[dayKey] = value;
+    return;
+}
 
 const setQuantitativeState = (
     state: HabitState[],
@@ -83,7 +111,6 @@ const addHabitWeekState = (
     for (let i = 0; i < 7; i++) {
         const dateKey = addDaysToDateString(startWeek, i);
         defaultData[dateKey] = null;
-
     }
 
     const weekData = { startWeek, data: data || defaultData };
@@ -93,9 +120,9 @@ const addHabitWeekState = (
 
 const addHabitState = (
     state: HabitState[],
-    action: PayloadAction<HabitState>
+    action: PayloadAction<{ habit: HabitState}>
 ) => {
-    state.push(action.payload);
+    state.push(action.payload.habit);
 }
 
 const setHabitStates = (
@@ -103,25 +130,35 @@ const setHabitStates = (
     action: PayloadAction<HabitState[]>
 ) => {
     return action.payload;
-}
+} 
 
 /**
  * Habit Slice
  */
+
+import { addNewHabitThunk } from './habitThunk';
 export const habitSlice = createSlice({
     name: 'habits',
-    initialState: initalState, 
+    initialState: initialState, 
     reducers: {
-        invertBool: invertBooleanState,
         setQuantitative: setQuantitativeState, 
+        setBoolean: setBooleanState,
         addHabitWeek: addHabitWeekState,
         addHabit: addHabitState, 
         setHabits: setHabitStates,
     },
+    extraReducers: (builder) => {
+        builder.addCase(setAtomStateThunk.fulfilled, (state, action) => {
+            setAtomState(state, action);
+        })
+
+        builder.addCase(addNewHabitThunk.fulfilled, (state, action) => {
+            addHabitState(state, action);
+        })
+    }
 });
 
 export const { 
-    invertBool, 
     setQuantitative,
     addHabitWeek, 
     addHabit, 

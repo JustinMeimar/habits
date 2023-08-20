@@ -2,55 +2,56 @@ import React, { useState, useEffect } from 'react';
 import { HabitType } from '../state/habitSlice';
 import { useDispatch } from 'react-redux';
 import { setQuantitative } from '../state/habitSlice';
+import { setBooleanStateThunk, setAtomStateThunk} from '../state/habitThunk';
+import { AppDispatch } from '../state/store';
 
 type HabitAtomProps = {
     habitId: string,
     weekKey: string,
     dateKey: string,  
-    atom: boolean | string| number | null;
+    atomValue: boolean | string| number | null;
     type: HabitType;
-    editAtom: (dateKey : string, type: HabitType) => void; 
 };
 
-const HabitAtom: React.FC<HabitAtomProps> = ({ habitId, weekKey, dateKey, atom, type, editAtom }) => {
+const HabitAtom: React.FC<HabitAtomProps> = ({ habitId, weekKey, dateKey, atomValue, type }) => {
     
     // const [atomType, setAtomType] = useState<any | null>(null);
     const [showInput, setShowInput] = useState<boolean>(false);
     const [inputValue, setInputValue] = useState<string>("");
-
-    const handleClick = () => {
-        console.log("click on:", type);
-        editAtom(dateKey, type);
-    }
-
+ 
     useEffect(() => {
     }, []);
 
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleQuantAtomInput = (input: string) => {
-        console.log("set this value to the habit data:", input)
-
         const parsedInt: number = parseInt(input, 10);
-
         if (!isNaN(parsedInt)) {
-            dispatch(setQuantitative({habitId: habitId, weekKey: weekKey, dayKey: dateKey, value: parsedInt}))
+            dispatch(setAtomStateThunk({habitId: habitId, weekKey: weekKey, dayKey: dateKey, value: parsedInt}))
         }
         setShowInput(false)
-        // dispatch(setQuantitative({habitId: habitId))
     }
 
-    // to be put in quantitativeHabitAtom component
+    const handleBoolAtomClick = () => {
+        let updateValue: boolean = true;
+        if ( atomValue !== null) {
+            updateValue = !atomValue;
+        } 
+        dispatch(setAtomStateThunk({habitId: habitId, weekKey: weekKey, dayKey: dateKey, value: updateValue}))
+    }
+
     const renderAtom = () => {
         switch (type) {
             case HabitType.Boolean: {
-                return <div style={{
-                    width: '20px', 
-                    height: '20px',
-                    border: '1px solid grey',
-                    borderRadius: '3px',
-                    backgroundColor: atom !== null ? (atom ? '#97ed5a' : '#f0f0f0') : 'transparent',
-                }}>
+                return <div 
+                    onClick = {handleBoolAtomClick} 
+                    style={{
+                        width: '20px', 
+                        height: '20px',
+                        border: '1px solid grey',
+                        borderRadius: '3px',
+                        backgroundColor: atomValue !== null ? (atomValue ? '#97ed5a' : '#f0f0f0') : 'transparent',
+                    }}>
                 </div>
             }
             case HabitType.Quantitative:
@@ -74,16 +75,16 @@ const HabitAtom: React.FC<HabitAtomProps> = ({ habitId, weekKey, dateKey, atom, 
                             height: '20px',
                             border: '1px solid grey',
                             borderRadius: '3px',
-                            backgroundColor: atom !== null ? '#b7fb95' : 'transparent',
+                            backgroundColor: atomValue !== null ? '#b7fb95' : 'transparent',
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center', 
                         }}>
-                        {atom}
+                        {atomValue}
                     </div>
                 );
             case HabitType.Qualitative:
-                return atom || 'None';
+                return atomValue || 'None';
             default:
                 return (
                     <div className="habit-atom" style={{
@@ -97,9 +98,7 @@ const HabitAtom: React.FC<HabitAtomProps> = ({ habitId, weekKey, dateKey, atom, 
     } 
 
     return (
-        <div 
-            onClick={ type === HabitType.Boolean ? handleClick : () => {}}
-            style={{
+        <div style={{
                 flex: 1,
                 height: '40px',
                 display: 'flex',
