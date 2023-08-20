@@ -1,12 +1,12 @@
 import next from 'next/types';
 import React, { useState, useEffect } from 'react';
-import "../globals.css"
+import "../../globals.css"
 
 export type WeekHeaderProps = {
     startDate: string, 
 }
 
-import { addDaysToDateString } from '../util/dateUtil';
+import { addDaysToDateString } from '../../util/dateUtil';
 
 const WeekHeader: React.FC<WeekHeaderProps> = ({ startDate }) => {
  

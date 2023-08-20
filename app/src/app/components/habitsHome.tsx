@@ -11,7 +11,7 @@ import { HabitType } from '../state/habitSlice';
 import HabitModal from './habitModal';
 import HabitWeek from './habitWeek';
 import '../globals.css';
-import WeekHeader from './weekHeader';
+import WeekHeader from './calendar/weekHeader';
 
 export const fetchHabits = async (startDate : Date, userId : string | null) => {
     /**
@@ -67,8 +67,6 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
     // container vars
     const [newHabitName, setNewHabitName] = useState<string>("");
     const [newHabitType, setNewHabitType] = useState<HabitType>(HabitType.Boolean); 
-    const [editMode, setEditMode] = useState<boolean>(false);
-    const [editHabitId, setEditHabitId] = useState<number>(-1);
     const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
 
     useEffect(() => {
@@ -103,29 +101,22 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
         // TODO: delete a habit
     }
 
-    const editHabit = (id: number) => {
+    const handleEditHabit = (habit: HabitState) => {
         // TODO: edit a habit 
-
-        // setNewHabitType(habit.type);
-        // setNewHabitName(habit.name);
-        // setEditHabitId(habit.id)
-        setEditMode(true);
-        setModalIsOpen(true);
+        console.log(habit.habitId);
     }
 
     const onFormSubmit = () => { 
-        if (editMode) {
-            // TODO: handle edit submit form
-        } else {
-            console.log("submitted in add mode");
-            const newHabit : HabitState = {
-                habitId: (habitStates.length + 1).toString(), 
-                title: newHabitName, 
-                habitType: newHabitType, 
-                weeks: []
-            };
-            dispatch(addHabit(newHabit));
-        }
+
+        console.log("submitted in add mode");
+        const newHabit : HabitState = {
+            habitId: (habitStates.length + 1).toString(), 
+            title: newHabitName, 
+            habitType: newHabitType, 
+            weeks: []
+        };
+        dispatch(addHabit(newHabit));
+        
         setModalIsOpen(false);
         setNewHabitName("");
         setNewHabitType(HabitType.Boolean);
@@ -133,7 +124,6 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
     
     const onFormRequestClose = () => {
         setModalIsOpen(false);
-        setEditMode(false);
         setNewHabitName("");
         setNewHabitType(HabitType.Boolean);
     }
@@ -142,7 +132,6 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
         <div className="habit-home">
             <HabitModal
                 isOpen={modalIsOpen}
-                editMode={editMode}
                 newHabitName={newHabitName}
                 newHabitType={newHabitType}
                 onFormNameChange={(name : string) => {setNewHabitName(name)}}
@@ -161,15 +150,37 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
                     <div key={`habit-week-wrapper-${idx}`} className="habit-week-wrapper">
                         <HabitWeek habit={habit} startDate={startDate} />
                         <div className="button-wrapper">      
-                            {/* <div className="button" key={`delete-btn-${idx}`} onClick={() => {}}>
-                                ❌
-                            </div> */}
-                            <div className="button" key={`edit-btn-${idx}`} onClick={() => {}}>
+                            <div className="button" key={`edit-btn-${idx}`} onClick={() => {handleEditHabit(habit)}}>
                             ✏️
                             </div>
                         </div>
                     </div>
                     ))}
+                    <div className="habit-menu-buttons">
+                        <div className="add-habit-button" 
+                            key="add-habit-button" 
+                            onClick={() => {setModalIsOpen(true)}}
+                            style={{
+                                border: "1px solid lightgray",
+                                borderRadius: "5px",
+                                marginTop: "10px"
+                            }}
+                        >
+                            Add habit
+                        </div> 
+                        <div 
+                            className="remove-habit-button" 
+                            key={`remove-habit-button`} 
+                            onClick={() => {}}
+                            style={{
+                                border: "1px solid lightgray",
+                                borderRadius: "5px",
+                                marginTop: "10px"
+                            }}
+                        >
+                            Remove habit
+                        </div>
+                    </div> 
                 </div>
             </div>
         </div> 

@@ -66,7 +66,6 @@ const setQuantitativeState = (
 
     week.data[dayKey] = value; 
     return;
-
 }
 
 const addHabitWeekState = (

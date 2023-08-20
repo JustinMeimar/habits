@@ -67,25 +67,9 @@ const HabitWeek: React.FC<HabitRowProps> = ({ habit, startDate }) => {
     const renderHabitAtoms = () => {
         if (habitWeekData) {
             return Object.entries(habitWeekData.data).map(([key, value]) => (
-                <HabitAtom key={key} dateKey={key} atom={value} type={habit.habitType} editAtom={handleEditAtom} />
+                <HabitAtom habitId={habit.habitId} weekKey={startDate} key={key} dateKey={key} atom={value} type={habit.habitType} editAtom={handleEditAtom} />
             ));
-        } else {
-            const nullArray: null[] = Array(7).fill(null);   
-            return nullArray.map((nullVal, idx) => (
-                <div 
-                    style={{
-                        flex: 1,
-                        height: '40px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        borderRight: '1px solid black',
-                        cursor: 'pointer'
-                    }} 
-                > ?
-                </div>
-            )); 
-        }
+        } 
     }; 
 
     return (

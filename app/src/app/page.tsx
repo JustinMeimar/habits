@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react'
-import WeekPicker from './components/weekPicker';
+import WeekPicker from './components/calendar/weekPicker';
 import store from './state/store'
 import { Provider } from 'react-redux'
 import HabitsHome from './components/habitsHome'

@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react';
 import Modal from 'react-modal';
-// import { HabitType } from './habitsContainer'
 import { HabitType } from '../state/habitSlice';
 
 interface HabitModalProps {
     isOpen: boolean;
-    editMode: boolean;
     newHabitName: string;
     newHabitType: HabitType;
     onFormNameChange: (name: string) => void;
@@ -16,7 +14,6 @@ interface HabitModalProps {
 
 const HabitModal: React.FC<HabitModalProps> = ({
     isOpen,
-    editMode,
     newHabitName,
     newHabitType,
     onFormNameChange,
@@ -30,7 +27,7 @@ const HabitModal: React.FC<HabitModalProps> = ({
         <Modal
             isOpen={isOpen}
             onRequestClose={onFormRequestClose}
-            contentLabel={ editMode ? "Edit Habit" : "Add Habit"}
+            contentLabel={"Add Habit"}
             ariaHideApp={false} 
             style={{
                 overlay: { backgroundColor: 'rgba(0, 0, 0, 0.75)' },
@@ -47,7 +44,7 @@ const HabitModal: React.FC<HabitModalProps> = ({
                 }
             }}
         >
-            <h2>{editMode ? "Edit Habit" : "Add New Habit"}</h2>
+            <h2>{"Add New Habit"}</h2>
             <input
                 type="text"
                 placeholder="Habit Name"
@@ -60,7 +57,7 @@ const HabitModal: React.FC<HabitModalProps> = ({
                 ))}
             </select>
             <div>
-                <button onClick={onFormSubmit}>{editMode ? "Edit Habit" : "Add Habit"}</button>
+                <button onClick={onFormSubmit}>{"Add Habit"}</button>
                 <button onClick={onFormRequestClose} style={{ marginLeft: '10px' }}>Cancel</button>
             </div>
         </Modal>
