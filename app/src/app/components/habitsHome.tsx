@@ -34,18 +34,6 @@ export const parseHabitData = (data: any) : HabitState => {
 
 
 export const getUninitializedHabitWeek = (habitType: HabitType) : HabitWeekState => {
-    
-    // let fillData: number | string | boolean; 
-
-    // switch (habitType) {
-    //     case HabitType.Boolean:
-    //         fillData = false; break;
-    //     case HabitType.Quantitative:
-    //         fillData = 0; break;
-    //     case HabitType.Qualitative:
-    //         fillData = ''; break;
-    // }
-    
     const startDate : string = getLastSundayFromDate(new Date());
     const defaultData: Record<string, boolean | string | number | null> = {}; 
     
@@ -76,7 +64,7 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
 
     useEffect(() => {
         loadHabitsOnInit();
-    }, [habitStates])
+    }, [])
 
     // Get the dispatch function
     const dispatch = useDispatch<AppDispatch>();
@@ -144,20 +132,12 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
                 onFormRequestClose={onFormRequestClose}
             />
             <div className="habit-container">
-                <div>
-                    
+                <div> 
                     <br></br>
-                    {
-                        <WeekHeader startDate={startDate} />
-                    } 
+                    {<WeekHeader startDate={startDate} />} 
                     {habitStates.map((habit, idx) => (
                     <div key={`habit-week-wrapper-${idx}`} className="habit-week-wrapper">
                         <HabitWeek habit={habit} startDate={startDate} />
-                        <div className="button-wrapper">      
-                            <div className="button" key={`edit-btn-${idx}`} onClick={() => {handleEditHabit(habit)}}>
-                            ✏️
-                            </div>
-                        </div>
                     </div>
                     ))}
                     <div className="habit-menu-buttons">
@@ -169,8 +149,7 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
                                 borderRadius: "5px",
                                 marginTop: "10px"
                             }}
-                        >
-                            Add habit
+                        > Add habit
                         </div> 
                         <div 
                             className="remove-habit-button" 

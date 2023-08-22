@@ -1,7 +1,11 @@
 // habitSlice.tsx
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { addDaysToDateString } from '../util/dateUtil';
-import { setAtomStateThunk } from './habitThunk';
+import {    setAtomStateThunk, 
+            addHabitWeekThunk, 
+            updateHabitTitleThunk,
+            deleteHabitThunk, 
+        } from './habitThunk';
 
 /**
  * Types
@@ -96,11 +100,13 @@ const setQuantitativeState = (
     return;
 }
 
-const addHabitWeekState = (
+
+// const addHabitWeekState = (
+const addHabitWeekReducer = (
     state: HabitState[],
-    action: PayloadAction<{ habitId: string; startWeek: string; data?: Record<string, boolean | string | number> }>
+    action: PayloadAction<{ habitId: string; startWeek: string }>
 ) => {
-    const { habitId, startWeek, data } = action.payload;
+    const { habitId, startWeek } = action.payload;
 
     // find the habit by habitId
     const habitIndex: number = state.findIndex((hs) => hs.habitId === habitId);
@@ -113,7 +119,7 @@ const addHabitWeekState = (
         defaultData[dateKey] = null;
     }
 
-    const weekData = { startWeek, data: data || defaultData };
+    const weekData = { startWeek, data: defaultData };
 
     state[habitIndex].weeks.push(weekData);
 }
@@ -132,6 +138,35 @@ const setHabitStates = (
     return action.payload;
 } 
 
+const updateHabitTitleReducer = (
+    state: HabitState[], 
+    action: PayloadAction<{ habitId: string; newTitle: string}>
+) => {
+    const { habitId, newTitle } = action.payload;
+
+    // find the habit by habitId
+    const habitIndex: number = state.findIndex((hs) => hs.habitId === habitId);
+    if (habitIndex === -1) return;
+
+    state[habitIndex].title = newTitle;
+} 
+
+
+const deleteHabitReducer = (
+    state: HabitState[], 
+    action: PayloadAction<{ habitId: string }>
+) => {
+    const { habitId } = action.payload;
+
+    // find the habit by habitId
+    const habitIndex: number = state.findIndex((hs) => hs.habitId === habitId);
+    if (habitIndex === -1) return;
+
+    // remove the habit from state
+    state.splice(habitIndex, 1)
+} 
+
+
 /**
  * Habit Slice
  */
@@ -143,7 +178,7 @@ export const habitSlice = createSlice({
     reducers: {
         setQuantitative: setQuantitativeState, 
         setBoolean: setBooleanState,
-        addHabitWeek: addHabitWeekState,
+        addHabitWeek: addHabitWeekReducer,
         addHabit: addHabitState, 
         setHabits: setHabitStates,
     },
@@ -154,6 +189,14 @@ export const habitSlice = createSlice({
 
         builder.addCase(addNewHabitThunk.fulfilled, (state, action) => {
             addHabitState(state, action);
+        })
+
+        builder.addCase(addHabitWeekThunk.fulfilled, (state, action) => {
+            addHabitWeekReducer(state, action);
+        })
+        
+        builder.addCase(updateHabitTitleThunk.fulfilled, (state, action) => {
+            updateHabitTitleReducer(state, action);
         })
     }
 });

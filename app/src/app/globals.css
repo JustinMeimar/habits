@@ -47,6 +47,25 @@
     background-color: #d0d0d0; /* Optional for hover effect */
 }
 
+.edit-button {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.delete-button {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.edit-button:hover {
+  transform: scale(1.1);
+}
 
 .home-header-container {
   width: 500px;

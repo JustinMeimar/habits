@@ -27,7 +27,7 @@ type UpdateDatabaseParams = {
 };
 
 export const updateDatabase = async (params: UpdateDatabaseParams) => {
-    console.log('update db');
+    console.log('update db', params);
 
     const userId = '1' 
     
@@ -53,8 +53,7 @@ export const apiAddNewHabit = async (habit : HabitState) => {
 
     console.log('add new habit:', habit);    
 
-    const userId = '1' 
-    
+    const userId = '1'  
     const baseUrl = 'http://127.0.0.1:5000'
     let url = `${baseUrl}/api/add-habit/${userId}`
 
@@ -70,6 +69,60 @@ export const apiAddNewHabit = async (habit : HabitState) => {
     const json = await res.json();
     
     console.log(res, json)
+}
+
+export const apiAddHabitWeek = async (habitId: string, startWeek: string) => {
+
+    console.log("api add new habit week:", habitId, startWeek);
+    const userId = '1'  
+    const baseUrl = 'http://127.0.0.1:5000'
+    
+    let url = `${baseUrl}/api/add-habit-week/${userId}/${habitId}`
+        url += `?start-week=${startWeek}`
+
+    console.log(url);
+    
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    });
+
+    const json = await res.json();
+    
+    console.log(res, json)
+}
+
+export const apiUpdateHabitTitle = async (userId: string, habitId: string, newTitle: string) => {
+    console.log("api update habit title:", habitId, newTitle);
+    
+    const baseUrl = 'http://127.0.0.1:5000'
+ 
+    let url = `${baseUrl}/api/update-habit-title/${userId}/${habitId}`
+        url += `?new-title=${newTitle}`
+
+    console.log(url);
+ 
+    const res = await fetch(url, { method: 'POST'});
+    const json = await res.json();
+    
+    console.log(res, json)
+}
+
+export const apiDeleteHabit = async (userId: string, habitId: string) => {
+    console.log("api delete habit :", habitId);
+    
+    const baseUrl = 'http://127.0.0.1:5000'
+ 
+    let url = `${baseUrl}/api/delete-habit/${userId}/${habitId}`
+
+    console.log(url);
+ 
+    // const res = await fetch(url, { method: 'POST'});
+    // const json = await res.json();
+    
+    // console.log(res, json)
 }
 
 export const setAtomStateThunk = createAsyncThunk(
@@ -88,9 +141,48 @@ export const addNewHabitThunk = createAsyncThunk(
     'habits/addNewHabit',
     async (params: { habit: HabitState }, thunkAPI) => {
         const { habit } = params;
-        
+       
+        // TODO: receieve the habit_id assigned by the database and 
+        // update the object state in the frontend accordingly
         await apiAddNewHabit(habit);
 
+        // something like: 
+        // const returnedHabitId = await apiNewHabit(habit);
+        // habit.habit_id = returnedHabitId
+
         return { habit };
+    }
+)
+
+export const addHabitWeekThunk = createAsyncThunk(
+    'habits/addNewHabitWeek',
+    async (params: { habitId: string; startWeek: string  }, thunkAPI) => {
+        const { habitId, startWeek } = params;
+        
+        await apiAddHabitWeek(habitId, startWeek);
+
+        return { habitId, startWeek };
+    }
+)
+
+export const updateHabitTitleThunk = createAsyncThunk(
+    'habits/updateHabitTitle',
+    async (params: { habitId: string; newTitle: string  }, thunkAPI) => {
+        const { habitId, newTitle } = params;
+ 
+        await apiUpdateHabitTitle('1', habitId, newTitle);
+
+        return { habitId, newTitle };
+    }
+)
+
+export const deleteHabitThunk = createAsyncThunk(
+    'habits/deleteHabit',
+    async (params: { habitId: string }, thunkAPI) => {
+        const { habitId } = params;
+ 
+        await apiDeleteHabit('1', habitId);
+
+        return { habitId };
     }
 )

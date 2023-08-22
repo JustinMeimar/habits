@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { HabitType } from '../state/habitSlice';
 import { useDispatch } from 'react-redux';
 import { setQuantitative } from '../state/habitSlice';
-import { setBooleanStateThunk, setAtomStateThunk} from '../state/habitThunk';
+import { setAtomStateThunk} from '../state/habitThunk';
 import { AppDispatch } from '../state/store';
 
 type HabitAtomProps = {

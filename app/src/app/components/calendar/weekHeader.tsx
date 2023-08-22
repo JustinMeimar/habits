@@ -1,6 +1,5 @@
 import next from 'next/types';
 import React, { useState, useEffect } from 'react';
-// import "../../globals.css"
 
 export type WeekHeaderProps = {
     startDate: string, 
