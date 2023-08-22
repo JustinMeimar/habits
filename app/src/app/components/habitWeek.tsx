@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { AppDispatch, RootState } from '../state/store';
 import { HabitWeekState } from '../state/habitSlice';
 import { HabitState } from '../state/habitSlice';
-import { addHabitWeekThunk, updateHabitTitleThunk } from '../state/habitThunk';
+import { addHabitWeekThunk, updateHabitTitleThunk, deleteHabitThunk } from '../state/habitThunk';
+
 import HabitAtom from "./habitAtom";
 import DeleteModal from './modal/deleteModal';
 import "../globals.css";
@@ -67,8 +68,9 @@ const HabitWeek: React.FC<HabitRowProps> = ({ habit, startDate }) => {
     const handleCloseModal = () => setShowDeleteModal(false);
      
     const handleDeleteModal = () => {
-        console.log("actually delete");
+        console.log("delete habit", habit)
         setShowDeleteModal(false);
+        dispatch(deleteHabitThunk({ habitId: habit.habitId }))
     } 
 
     const renderHabitAtoms = () => {

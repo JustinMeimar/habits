@@ -8,7 +8,7 @@ import { AppDispatch, RootState } from '@/app/state/store'
 import { HabitType } from '@/app/state/habitSlice';
 import { getLastSundayFromDate, subtractWeeksFromString } from '@/app/util/dateUtil';
 import { fetchHabits } from '@/app/api/request';
-import { addNewHabitThunk } from '@/app/state/habitThunk';
+import { addNewHabitThunk, deleteHabitThunk } from '@/app/state/habitThunk';
 import { addDaysToDateString } from '@/app/util/dateUtil';
 
 import WeekHeader from './calendar/weekHeader';
@@ -64,7 +64,9 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
 
     useEffect(() => {
         loadHabitsOnInit();
-    }, [])
+
+        console.log("reload on habit states change");
+    }, [habitStates])
 
     // Get the dispatch function
     const dispatch = useDispatch<AppDispatch>();
@@ -89,15 +91,6 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
         }); 
     }
  
-    const deleteHabit = (id: number) => {
-        // TODO: delete a habit
-    }
-
-    const handleEditHabit = (habit: HabitState) => {
-        // TODO: edit a habit 
-        console.log(habit.habitId);
-    }
-
     const onFormSubmit = () => { 
 
         console.log("submitted in add mode");
@@ -151,18 +144,6 @@ const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {
                             }}
                         > Add habit
                         </div> 
-                        <div 
-                            className="remove-habit-button" 
-                            key={`remove-habit-button`} 
-                            onClick={() => {}}
-                            style={{
-                                border: "1px solid lightgray",
-                                borderRadius: "5px",
-                                marginTop: "10px"
-                            }}
-                        >
-                            Remove habit
-                        </div>
                     </div> 
                 </div>
             </div>

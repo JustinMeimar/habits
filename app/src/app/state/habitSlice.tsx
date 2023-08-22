@@ -156,14 +156,20 @@ const deleteHabitReducer = (
     state: HabitState[], 
     action: PayloadAction<{ habitId: string }>
 ) => {
-    const { habitId } = action.payload;
 
-    // find the habit by habitId
-    const habitIndex: number = state.findIndex((hs) => hs.habitId === habitId);
-    if (habitIndex === -1) return;
+    const {habitId} = action.payload;
+ 
+    const newArray = state.filter((habit) => habit.habitId !== habitId);
+    
+    for (let i =0; i < newArray.length; i++) {
+        console.log(newArray[i].habitId);
+    }
 
-    // remove the habit from state
-    state.splice(habitIndex, 1)
+    state = newArray;
+
+    console.log(state.length);
+
+    return newArray;
 } 
 
 
@@ -197,6 +203,10 @@ export const habitSlice = createSlice({
         
         builder.addCase(updateHabitTitleThunk.fulfilled, (state, action) => {
             updateHabitTitleReducer(state, action);
+        })
+
+        builder.addCase(deleteHabitThunk.fulfilled, (state, action) => {
+            deleteHabitReducer(state, action);
         })
     }
 });

@@ -12,7 +12,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(128)) 
     email = db.Column(db.String(75))
 
-    habits = relationship('Habit', backref='user')
+    habits = relationship('Habit', backref='user', cascade='all, delete-orphan')
 
     def to_dict(self):
         return {
@@ -38,12 +38,13 @@ class Habit(db.Model):
     __tablename__ = "habit"
     
     id = db.Column(db.Integer, primary_key=True)
+    
+    habit_title = db.Column(db.String(30), nullable=False)
+    
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     type_id = db.Column(db.Integer, db.ForeignKey('habit_type.id'))
-
-    habit_title = db.Column(db.String(30)) 
-    
-    habit_data = relationship('HabitData', backref='habit')
+      
+    habit_data = relationship('HabitData', backref='habit', cascade='all, delete-orphan')
     type_data = relationship('HabitType', backref='habit')
 
     def get_habit_descriptor(self):

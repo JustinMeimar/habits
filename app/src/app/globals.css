@@ -1,3 +1,5 @@
+@import "~bootstrap/dist/css/bootstrap.min.css";
+
 .habit-container {
     width: 500px;
     margin: auto;
@@ -152,4 +154,10 @@
     justify-content: 'center';
     border-right: '1px solid black';
     cursor: 'pointer';
+}
+
+
+.login-title {
+    font-size: 40px;
+    font-weight: 300;
 }
