@@ -26,7 +26,3 @@ export const fetchHabitData = async (habitId: number, startDateRange: Date, endD
 
     return await res.json();
 }
-
-export const updateDatabase = async (habitId: string) => {
-
-} 

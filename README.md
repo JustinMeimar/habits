@@ -1,6 +1,6 @@
 # Habits
 
-Too many apps are cluttered with ads. 
+Too many habit apps are cluttered with ads. 
 
 This is a minimalist habit tracker that I use on my homeserver. 
 
