@@ -224,23 +224,38 @@ def install_routes(app: Flask):
         result = [hd.to_dict() for hd in habit_data]
 
         return jsonify(result)
-    
+
+    @app_bp.route("/register", methods=['POST'])
+    def register():
+        data = request.json
+        username = data['username']
+        password = data['password']
+        
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            return jsonify({"ok": False, "message":"Username already taken"}), 409
+
+        password_hash = generate_password_hash(password) 
+        user = User(username=username, password_hash=password_hash)
+ 
+        db.session.add(user)
+        db.session.commit()
+
+        return jsonify(success=True, message="User registered successfully")
     
     @app_bp.route("/login", methods=['POST'])
     def login():
         data = request.json
+        print(data)
         username = data['username']
         password = data['password']
 
-        print(username, password)
+        user = User.query.filter_by(username=username).first()
 
-        return "hello?"
-        # user = User.query.filter_by(username=username).first()
-
-        # if user and check_password_hash(user.password_hash, password):
-        #     login_user(user)
-        #     return jsonify(success=True, user=user.to_dict())
-        # return jsonify(success=False, message="Invalid credentials"), 401
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
+            return jsonify(success=True, user=user.to_dict())
+        return jsonify(success=False, message="Invalid credentials"), 401
 
     @cross_origin(supports_credenitals=True) 
     @login_required

@@ -1,29 +1,25 @@
 # Habits
 
-A habit tracker.
+Too many apps are cluttered with ads. 
 
-Made with Next.js, flask and Postgres. 
+This is a minimalist habit tracker that I use on my homeserver. 
 
-East to host on a homeserver for access anywhere
+Made with Next.js, Flask and Postgres.
+
 
 <img src="doc/habits.png" alt="Alternative Text: PNG could not load" height="400" />
 
 
-# Migrations
-
-To apply migrations locally:
-- Set the `MIGRATE_MODE` environment variable to `True`
-```shell
-export MIGRATE_MODE=True
-```
-
-- Activate the virtual environment and make migrations
-```shell
-source env/bin/activate
-flask db upgrade
-```
-
-- To undo the migration
-```shell
-flask db downgrade
-```
+# Feature map
+- [x] boolean habits
+- [x] quantitative habits 
+- [x] authentication
+- [x] add new habit
+- [x] edit habit
+- [x] database consistency
+- [x] multiple users
+- [ ] delete habits
+- [ ] qualitative habit system (user defined) 
+- [ ] google oauth 
+- [ ] sort habits by drag
+- [ ] run front and backend in docker network

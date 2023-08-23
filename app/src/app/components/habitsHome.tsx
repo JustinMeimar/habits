@@ -54,7 +54,6 @@ export type HabitsHomeProps = {
 
 const HabitsHome: React.FC<HabitsHomeProps> = ({ startDate }) => {    
     
-    // Get the count from the Redux state
     const habitStates = useSelector((state: RootState) => state.habits);
     
     // container vars

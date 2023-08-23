@@ -10,7 +10,8 @@ class User(db.Model):
 
     username = db.Column(db.String(30), nullable=False, unique=True)
     password_hash = db.Column(db.String(128)) 
-    email = db.Column(db.String(75))
+    email = db.Column(db.String(75)) 
+    is_active = db.Column(db.Boolean, default=False)
 
     habits = relationship('Habit', backref='user', cascade='all, delete-orphan')
 
